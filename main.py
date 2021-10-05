@@ -1,8 +1,8 @@
 """
 Title: Text classification from scratch
-Authors: Mark Omernick, Francois Chollet
+Authors: Mark Omernick, Francois Chollet, Justin Zollars
 Date created: 2019/11/06
-Last modified: 2020/05/17
+Last modified: 2021/10/06
 Description: Text sentiment classification starting from raw text files.
 """
 """
@@ -257,18 +257,18 @@ model = tf.keras.Model(inputs, predictions)
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
 
 """
-## Train the model
+## Train the model if it does not exist on disk
 """
 
 from os.path import exists
+
 
 if exists("jz.h5"):
     loaded_model = tf.keras.models.load_model("jz.h5")
     loaded_model.summary()
     loaded_model.evaluate(test_ds)
 else:
-
-    epochs = 2
+    epochs = 6
     # Fit the model using the train and test datasets.
     model.fit(train_ds, validation_data=val_ds, epochs=epochs)
     print("..............................................")
@@ -303,12 +303,8 @@ else:
     # Test it with `raw_test_ds`, which yields raw strings
     end_to_end_model.evaluate(raw_test_ds)
 
-    # serialize model to JSON
-    model_json = model.to_json()
-    with open("model.json", "w") as json_file:
-        json_file.write(model_json)
-    # serialize weights to HDF5
-    model.save_weights("model.h5")
+
+    # Save the model for later use
     model.save("jz.h5")
     print("Saved model to disk")
 
