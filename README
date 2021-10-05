@@ -1,0 +1,8 @@
+This example shows how to do text classification starting from raw text (as
+a set of text files on disk). We demonstrate the workflow on the IMDB sentiment
+classification dataset (unprocessed version). We use the `TextVectorization` layer for
+word splitting & indexing.
+
+Sentimate is classified as either positive or negative.
+
+The example is expanded to load the model from disk, if it was already trained.
