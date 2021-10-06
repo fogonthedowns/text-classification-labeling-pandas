@@ -82,6 +82,7 @@ get have no overlap.
 """
 
 batch_size = 32
+# tf.data.DataSet
 raw_train_ds = tf.keras.preprocessing.text_dataset_from_directory(
     "aclImdb/train",
     batch_size=batch_size,
@@ -105,6 +106,7 @@ raw_one_ds = tf.keras.preprocessing.text_dataset_from_directory(
     "aclImdb/one", batch_size=batch_size
 )
 
+"""
 print(
     "Number of batches in raw_train_ds: %d"
     % tf.data.experimental.cardinality(raw_train_ds)
@@ -116,6 +118,7 @@ print(
     "Number of batches in raw_test_ds: %d"
     % tf.data.experimental.cardinality(raw_test_ds)
 )
+"""
 
 """
 Let's preview a few samples:
@@ -127,11 +130,12 @@ Let's preview a few samples:
 # This is one of the places where eager execution shines:
 # we can just evaluate these tensors using .numpy()
 # instead of needing to evaluate them in a Session/Graph context.
+"""
 for text_batch, label_batch in raw_train_ds.take(1):
     for i in range(5):
         print(text_batch.numpy()[i])
         print(label_batch.numpy()[i])
-
+"""
 """
 ## Prepare the data
 In particular, we remove `<br />` tags.
@@ -267,6 +271,38 @@ if exists("jz.h5"):
     loaded_model = tf.keras.models.load_model("jz.h5")
     loaded_model.summary()
     loaded_model.evaluate(test_ds)
+    inputs = tf.keras.Input(shape=(1,), dtype="string")
+    # Turn strings into vocab indices
+    indices = vectorize_layer(inputs)
+    # Turn vocab indices into predictions
+    outputs = loaded_model(indices)
+
+    # Our end to end model
+    end_to_end_model = tf.keras.Model(inputs, outputs)
+    end_to_end_model.compile(
+        loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
+    )
+
+
+    # Test it with `raw_test_ds`, which yields raw strings
+    end_to_end_model.evaluate(raw_test_ds)
+
+    # Load a single review from disk
+    print("predicting a single thing...")
+    print(raw_test_ds.take(1))
+    file = open("/home/jzollars/hack/txt/neg2.txt")
+    line = file.read().replace("\n", " ")
+    file.close()
+    print(line)
+
+    # rm , [1,0]
+    # Build a data set from file, and run predict against the model
+    ds = tf.data.Dataset.from_tensors(([line]))
+    print("***************************************************")
+    print(end_to_end_model.predict(ds))
+    print("***************************************************")
+
+    # print(end_to_end_model.predict(raw_test_ds.take(1)))
 else:
     epochs = 6
     # Fit the model using the train and test datasets.
