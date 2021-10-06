@@ -320,13 +320,13 @@ if exists("jz.h5"):
         print(dd[0][i])
         ans = dd[1][i]
         if v < 0.5:
-            print(f'predicted: 0 actual {ans}')
+            print(f'predicted: 0 actual {ans} value {v}')
         else:
-            print(f'predicted: 1 actual {ans}')
+            print(f'predicted: 1 actual {ans} value {v}')
         print("*************")
 
 else:
-    epochs = 6
+    epochs = 2
     # Fit the model using the train and test datasets.
     model.fit(train_ds, validation_data=val_ds, epochs=epochs)
     print("..............................................")
