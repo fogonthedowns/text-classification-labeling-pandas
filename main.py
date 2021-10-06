@@ -267,6 +267,12 @@ model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
 from os.path import exists
 
 
+def predictionClass(p):
+    if p > 0.5:
+        print(1)
+    else:
+        print(0)
+
 if exists("jz.h5"):
     loaded_model = tf.keras.models.load_model("jz.h5")
     loaded_model.summary()
@@ -290,7 +296,7 @@ if exists("jz.h5"):
     # Load a single review from disk
     print("predicting a single thing...")
     print(raw_test_ds.take(1))
-    file = open("/home/jzollars/hack/txt/neg2.txt")
+    file = open("/home/jzollars/hack/txt/review.txt")
     line = file.read().replace("\n", " ")
     file.close()
     print(line)
@@ -299,10 +305,26 @@ if exists("jz.h5"):
     # Build a data set from file, and run predict against the model
     ds = tf.data.Dataset.from_tensors(([line]))
     print("***************************************************")
-    print(end_to_end_model.predict(ds))
+    p = end_to_end_model.predict(ds)
+    predictionClass(p)
     print("***************************************************")
 
-    # print(end_to_end_model.predict(raw_test_ds.take(1)))
+
+    raw = raw_test_ds.take(1)
+    dd = list(raw.as_numpy_iterator())[0]
+    print(dd)
+    print("emoji")
+
+    p2 = end_to_end_model.predict(raw_test_ds.take(1))
+    for i,v in enumerate(p2):
+        print(dd[0][i])
+        ans = dd[1][i]
+        if v < 0.5:
+            print(f'predicted: 0 actual {ans}')
+        else:
+            print(f'predicted: 1 actual {ans}')
+        print("*************")
+
 else:
     epochs = 6
     # Fit the model using the train and test datasets.
